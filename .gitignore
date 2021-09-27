@@ -14,3 +14,5 @@ docs/crowdin.py
 *.flac
 *.mo
 *.json
+/dist
+/SpaceAc_tools.egg-info

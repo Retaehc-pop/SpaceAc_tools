@@ -27,7 +27,6 @@ setup(name='SpaceAc_tools',
       author='Retaehc_pop',
       author_email='Papop2003@gmail.com',
       license='MIT',
-      packages=['SpaceAC_tools'],
       zip_safe=False,
       install_requires=requirements,
       python_requires='>3.8.0')
