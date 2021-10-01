@@ -5,7 +5,7 @@ except:
 
 
 class Port:
-    def __init__(self, device, end: str, start=None, baudrate=9600, file_name='', key=None):
+    def __init__(self, device, end: str, start=None, baudrate=9600, file_name='log', key=None):
         self.device = device
         self.baudrate = baudrate
         self.end = end
@@ -15,26 +15,25 @@ class Port:
 
     @staticmethod
     def list_port():
-        if sys.platform == 'win32':
-            for i in range(256):
-                comtest = 'COM' + str(i)
-                try:
-                    serial.Serial(comtest)
-                except:
-                    pass
-                else:
-                    yield comtest
-        else:
-            raise "This function is only available on win32"
+        com = []
+        for i in range(256):
+            comtest = 'COM' + str(i)
+            try:
+                serial.Serial(comtest)
+            except:
+                pass
+            else:
+                com.append[comtest]
 
     def read(self):
-        inp = ''
+        inp = self.device.read().decode('utf-8')
         pkg = ''
         while inp != self.end:
             if self.start is not None and inp == self.start:
                 pkg = ''
-            pkg += inp
-            inp = self.device.read().decode('utf-8')
+            if inp in string.printable:
+                pkg += inp
+                inp = self.device.read().decode('utf-8')
         pkg = pkg.replace('\r', '').replace('\n', '')
         return pkg
 
