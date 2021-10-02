@@ -70,3 +70,16 @@ class Port:
             return dic
         else:
             raise AttributeError
+
+
+if __name__ == "__main__":
+    Allport = Port.list_port()
+    for index, port in enumerate(Allport):
+        print(f'{index+1}:{port}')
+    com = int(input("Choose port :"))-1
+    print(Allport[com])
+    device = serial.Serial(Allport[com], baudrate=9600, timeout=60)
+    COM = Port(device, '$')
+    print(f'saving file to {COM.path}')
+    while True:
+        COM.rading()
