@@ -16,3 +16,4 @@ docs/crowdin.py
 *.json
 /dist
 /SpaceAc_tools.egg-info
+/build
