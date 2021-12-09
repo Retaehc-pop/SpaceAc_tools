@@ -4,7 +4,9 @@ except:
     from ._global import *
 from PySide6.QtCharts import *
 from PySide6.QtGui import QColor, QPen
-
+import pyqtgraph
+pyqtgraph.setConfigOption('background', 'w')
+pyqtgraph.setConfigOption('foreground', 'k')
 
 
 class toPlot:
@@ -87,6 +89,10 @@ class GraphicGraph:
         self.X_AXIS.setRange(min(Minx), max(Maxx))
         self.Y_AXIS.setRange(min(Miny), max(Maxy))
 
+
+class Graph:
+    def __init__(self, graph: pyqtgraph.PlotWidget):
+        pass
 
 
 if __name__ == "__main__":

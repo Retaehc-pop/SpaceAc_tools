@@ -1,10 +1,4 @@
-from PySide6.QtCore import *
-import sys
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette
-from PySide6 import QtWidgets
-from PySide6.QtGui import *
-import folium as folium
+# import folium as folium
 
 try:
     from _global import *
@@ -114,105 +108,8 @@ class GNSS:
         return pyx * 180/math.pi
 
 
-class CompassWidget(QtWidgets.QWidget):
-    angleChanged = Signal(float)
-
-    def __init__(self, parent=None):
-
-        QtWidgets.QWidget.__init__(self, parent)
-
-        self._angle = 0.0
-        self._margins = 10
-        self._pointText = {0: "N", 45: "NE", 90: "E", 135: "SE", 180: "S",
-                           225: "SW", 270: "W", 315: "NW"}
-
-    def paintEvent(self, event):
-
-        painter = QPainter()
-        painter.begin(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-
-        painter.fillRect(event.rect(), self.palette().brush(QPalette.Window))
-        self.drawMarkings(painter)
-        self.drawNeedle(painter)
-
-        painter.end()
-
-    def drawMarkings(self, painter):
-
-        painter.save()
-        painter.translate(self.width() / 2, self.height() / 2)
-        scale = min((self.width() - self._margins) / 120.0,
-                    (self.height() - self._margins) / 120.0)
-        painter.scale(scale, scale)
-
-        font = QFont(self.font())
-        font.setPixelSize(10)
-        metrics = QFontMetrics(font)
-
-        painter.setFont(font)
-        painter.setPen(self.palette().color(QPalette.Shadow))
-
-        i = 0
-        while i < 360:
-
-            if i % 45 == 0:
-                painter.drawLine(0, -40, 0, -50)
-                # painter.drawText(-metrics.width(self._pointText[i])/2, -52, self._pointText[i])
-            else:
-                painter.drawLine(0, -45, 0, -50)
-
-            painter.rotate(15)
-            i += 15
-
-        painter.restore()
-
-    def drawNeedle(self, painter):
-
-        painter.save()
-        painter.translate(self.width() / 2, self.height() / 2)
-        painter.rotate(self._angle)
-        scale = min((self.width() - self._margins) / 120.0,
-                    (self.height() - self._margins) / 120.0)
-        painter.scale(scale, scale)
-
-        painter.setPen(QPen(Qt.NoPen))
-        painter.setBrush(self.palette().brush(QPalette.Shadow))
-
-        painter.drawPolygon(
-            QPolygon([QPoint(-10, 0), QPoint(0, -45), QPoint(10, 0),
-                      QPoint(0, 45), QPoint(-10, 0)])
-        )
-
-        painter.setBrush(self.palette().brush(QPalette.Highlight))
-
-        painter.drawPolygon(
-            QPolygon([QPoint(-5, -25), QPoint(0, -45), QPoint(5, -25),
-                      QPoint(0, -30), QPoint(-5, -25)])
-        )
-
-        painter.restore()
-
-    def sizeHint(self):
-
-        return QSize(150, 150)
-
-    def angle(self):
-        return self._angle
-
-    @Slot(int)
-    def setAngle(self, angle):
-
-        if angle != self._angle:
-            self._angle = angle
-            self.angleChanged.emit(angle)
-            self.update()
-
-    angle = Property(float, angle, setAngle)
-
-
 class FoliumMap:
-    def __init__(self, map: QWebEngineView, ground, tiles='OpenStreetMap') -> None:
+    def __init__(self, map, ground, tiles='OpenStreetMap') -> None:
         """
         get a QWebEngineView and start position 
         [optional] Tiles 
@@ -265,14 +162,45 @@ class myapp(QWidget):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        coord = (15, 100)
+        with open("D:\Code\Space_Us-paper\GCS\Data_log\Comtestall_Oct-05-2021_17_57.csv", 'r') as file:
+            datas = file.readlines()
+        C = []
+        SP1 = []
+        SP2 = []
+        for data in datas:
+            data = data.replace('\n', '')
+            data = data.split(',')
+            if len(data) > 3:
+                if data[2] == 'C':
+                    C.append(data)
+                elif data[2] == 'SP1':
+                    SP1.append(data)
+                elif data[2] == 'SP2':
+                    SP2.append(data)
+        C_coord = []
+        S1_coord = []
+        S2_coord = []
+        for i in C:
+            if float(i[3]) == 0 and float(i[4]) == 0:
+                pass
+            else:
+                C_coord.append((float(i[3]), float(i[4])))
+        for i in SP2:
+            if float(i[3]) == 0 and float(i[4]) == 0:
+                pass
+            else:
+                S2_coord.append((float(i[3]), float(i[4])))
+
         self._map = folium.Map(
-            location=coord,
+            location=C_coord[0],
             tiles='OpenStreetMap',
             zoom_start=16
             # min_zoom=10
         )
-
+        folium.PolyLine(C_coord, color="red", weight=2.5,
+                        opacity=1).add_to(self._map)
+        folium.PolyLine(S2_coord, color="green", weight=2.5,
+                        opacity=1).add_to(self._map)
         data = io.BytesIO()
         self._map.save(data, close_file=False)
 

@@ -39,10 +39,12 @@ class RTC:
             time_list) if second % 2 == 0 else ':'.join(time_list)
         return timestp
 
+    @staticmethod
+    def date():
+        return datetime.now().date()
+
 
 if __name__ == '__main__':
+    print(RTC.date())
     clock = RTC()
-    while True:
-        print(f'elspsed {clock.time_elapsed()}')
-        print(f'pc {clock.time_pc()}')
-        time.sleep(0.01)
+
