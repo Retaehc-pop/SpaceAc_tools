@@ -17,3 +17,5 @@ docs/crowdin.py
 /dist
 /SpaceAc_tools.egg-info
 /build
+/Data_log
+*.kml

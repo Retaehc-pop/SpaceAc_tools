@@ -153,10 +153,22 @@ if __name__ == "__main__":
         print(f'{index+1}:{port}')
     com = int(input("Choose port :"))-1
     print(Allport[com])
-    COM = Port(Allport[com], '$', file_name='test3')
+    COM = Port(Allport[com], '$', file_name='ALIEN')
     COM.connect()
+    GNSS = int(input("gearth? 0(no) or 1(yes): "))
+    if GNSS == 1:
+        COM.gearthlive()
+        LAT_index = int(input("index of latitude: "))
+        LNG_index = int(input("index of longitude: "))
     print(f'saving file to {COM.path}')
     while True:
-        COM.reading()
-
-
+        PKG = COM.reading()
+        print(','.join(PKG))
+        if GNSS == 1:
+            try:
+                LAT = PKG[LAT_index]
+                LNG = PKG[LNG_index]
+                coord = f"{LAT},{LNG}"
+                COM.gearthcoord(coord)
+            except:
+                print("WRONG INDEX FOR LAT AND LON")
